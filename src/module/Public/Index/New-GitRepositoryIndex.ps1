@@ -62,14 +62,11 @@ function New-GitRepositoryIndex {
                 @{
                     Path          = (Get-Location).Path
                     RemoteUrl     = git remote -v | Select-String "(?<remote>http(s)?://.*\s)" | Select-Object -first 1 @{Label = "remote"; Expression = { $_.Matches.Captures.Value } } | select-object -ExpandProperty remote
-#                    DefaultBranch = ((git branch -a ) -match "^\*").Trim("*").Trim()
+                    DefaultBranch = (git branch -a ) | ForEach-Object { $_ -match "(?<branch>^\*\s.*)" } | Where-Object { $_ } | ForEach-Object { $Matches.branch.Trim('*').Trim()} | Select-Object -First 1
                 }
             } `
-            -End { Pop-Location } | ConvertTo-Json 
+            -End { Pop-Location } 
 
-        $index | Out-File -LiteralPath (Join-Path -Path $gitIndexFilePath -ChildPath "index.json")
-
-
-
+        $index | ConvertTo-Json | Out-File -LiteralPath (Join-Path -Path $gitIndexFilePath -ChildPath "index.json")
     }
 }

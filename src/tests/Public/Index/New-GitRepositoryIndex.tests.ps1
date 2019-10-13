@@ -32,6 +32,8 @@ Describe "test" {
         It "test" {
             New-GitRepositoryIndex 
 
+            Test-Path ".index_multi_git_posh/index.json" | Should -BeTrue
+
         }
     }
 }

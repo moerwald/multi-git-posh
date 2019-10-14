@@ -1,7 +1,7 @@
 Remove-Module MultiGitPosh -ErrorAction SilentlyContinue
 Import-Module "$PSScriptRoot/../../../module/MultiGitPosh.psd1" -Verbose
 
-Describe "test" {
+Describe "Tests for index file descripton" {
 
     BeforeEach {
         Get-ChildItem $env:TEMP -Recurse -Include "testRepos*" | Remove-Item -Recurse -Force
@@ -28,12 +28,10 @@ Describe "test" {
     AfterEach {
         Pop-Location
     }
-    Context "test" {
-        It "test" {
+        It "Index file is created" {
             New-GitRepositoryIndex 
 
-            Test-Path ".index_multi_git_posh/index.json" | Should -BeTrue
+            Test-Path "./.index_multi_git_posh/index_git_repos.json" | Should -BeTrue
 
         }
-    }
 }

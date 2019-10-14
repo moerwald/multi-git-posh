@@ -55,7 +55,8 @@ function New-GitRepositoryIndex {
 
         New-Item -Path $RootPathOfGitRepositories -Name $indexDirectoryName -ItemType Directory -ErrorAction SilentlyContinue
 
-        $index = $foundGitRepositories.Parent.FullName | ForEach-Object `
+        $index = @{}
+        $index.Repositories = @($foundGitRepositories.Parent.FullName | ForEach-Object `
             -Begin { Push-Location }  `
             -Process {
                 Set-Location $_
@@ -66,7 +67,8 @@ function New-GitRepositoryIndex {
                 }
             } `
             -End { Pop-Location } 
+        )
 
-        $index | ConvertTo-Json | Out-File -LiteralPath (Join-Path -Path $gitIndexFilePath -ChildPath "index.json")
+        $index | ConvertTo-Json | Out-File -LiteralPath (Join-Path -Path $gitIndexFilePath -ChildPath $IndexFileName)
     }
 }

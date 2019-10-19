@@ -1,4 +1,3 @@
-Write-Host "SOURCInG FILES"
 $Private = @(Get-ChildItem "$PSScriptRoot/Private" -Recurse -Include *.ps1)
 $Public  = @(Get-ChildItem "$PSScriptRoot/Public" -Recurse -Include *.ps1)
 

@@ -19,7 +19,7 @@ Describe "Tests for index file descripton" {
                 git add ReadMe.md
                 git commit -m "Initial commit"
             }
-            finally{
+            finally {
                 Pop-Location
             }
         }
@@ -28,17 +28,17 @@ Describe "Tests for index file descripton" {
     AfterEach {
         Pop-Location
     }
-        It "Index file is created" {
-            New-GitRepositoryIndex 
+    It "Index file is created" {
+        New-GitRepositoryIndex 
 
-            Test-Path "./.index_multi_git_posh/index_git_repos.json" | Should -BeTrue
-        }
+        Test-Path "./.index_multi_git_posh/index_git_repos.json" | Should -BeTrue
+    }
 
-        It "Index file contains three GIT repos" {
-            New-GitRepositoryIndex 
+    It "Index file contains three GIT repos" {
+        New-GitRepositoryIndex 
 
-            $index = Get-Content "./.index_multi_git_posh/index_git_repos.json" | ConvertFrom-Json
-            $index.Repositories.Count | Should -Be 3
+        $index = Get-Content "./.index_multi_git_posh/index_git_repos.json" | ConvertFrom-Json
+        $index.Repositories.Count | Should -Be 3
 
-        }
+    }
 }

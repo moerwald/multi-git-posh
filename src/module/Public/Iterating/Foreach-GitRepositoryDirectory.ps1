@@ -33,7 +33,7 @@ function ForEach-GitRepositoryDirectory {
         [Parameter(Mandatory = $false, Position = 1)]
         [ValidateNotNullOrEmpty()]
         [scriptblock]
-        $Predicate = { }
+        $Predicate = { $true }
     )
     
     end {

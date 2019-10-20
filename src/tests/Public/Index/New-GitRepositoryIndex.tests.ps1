@@ -7,12 +7,14 @@ Describe "Tests for index file descripton" {
 
     BeforeEach {
         CreateTestRepositories 
+        Push-Location
         Set-Location "$env:TEMP/testRepos"
     }
 
     AfterEach {
         Pop-Location
     }
+
 
     It "Index file is created" {
         New-GitRepositoryIndex 

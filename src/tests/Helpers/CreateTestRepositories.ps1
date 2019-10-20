@@ -8,8 +8,8 @@ function CreateTestRepositories {
     )
     
     end {
-        Push-Location
 
+        Push-Location
         try {
             # Remove old test repositories
             Get-ChildItem $env:TEMP -Recurse -Include "testRepos*" | Remove-Item -Recurse -Force

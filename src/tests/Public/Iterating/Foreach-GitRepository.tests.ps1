@@ -7,8 +7,8 @@ Describe "Tests to check if repository iterating works" {
 
     BeforeEach {
         CreateTestRepositories 
+        Push-Location
         Set-Location "$env:TEMP/testRepos"
-
         New-GitRepositoryIndex 
     }
 
@@ -41,5 +41,16 @@ Describe "Tests to check if repository iterating works" {
         $script:ctnr | Should -Be 2
         $repos.Count | Should -Be 1
         "repo_2" | Should -BeIn $repos
+    }
+
+    It "ForEach-GitRepository switches in each GIT repo directory" {
+        $repos = [System.Collections.ArrayList]( "repo_1", "repo_2", "repo_3")
+        $script:ctnr = 0
+        ForEach-GitRepository -Callback { 
+            $repos.Remove((Split-Path (Get-Location) -Leaf))
+        } -ChangeLocationToGitRepo $true
+
+        # Check if all repos were iterated
+        $repos.Count | Should -Be 0
     }
 }

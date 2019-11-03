@@ -22,8 +22,8 @@
 #>
 function ForEach-GitRepository {
     [CmdletBinding(
-                   HelpUri = 'http://www.microsoft.com/',
-                   ConfirmImpact='Low')]
+        HelpUri = 'http://www.microsoft.com/',
+        ConfirmImpact = 'Low')]
     [Alias("fgr")]
     Param (
         [Parameter(Mandatory = $true, Position = 0)]
@@ -32,12 +32,10 @@ function ForEach-GitRepository {
         $Callback, 
         [Parameter(Mandatory = $false, Position = 1)]
         [ValidateNotNullOrEmpty()]
-        [bool]
-        $ChangeLocationToGitRepo = $true,
-        [Parameter(Mandatory = $false, Position = 2)]
-        [ValidateNotNullOrEmpty()]
         [scriptblock]
-        $Predicate = { $true}
+        $Predicate = { $true },
+        [switch]
+        $Parallel
     )
     
     begin {
@@ -47,23 +45,42 @@ function ForEach-GitRepository {
         $path = Join-Path -Path $IndexDirectoryName -ChildPath $IndexFileName
         $gitRepoInfo = Get-Content $path | ConvertFrom-Json -Depth 10
 
-        $gitRepoInfo.Repositories | Where-Object $Predicate | ForEach-Object -Process {
-            if ($Callback){
-                if ($ChangeLocationToGitRepo){
-                    # Change to GIT repo directory
-                    try{
-                        Push-Location
-                        Set-Location $_.Path
-                        $Callback.InvokeWithContext(@{ }, @(New-Object "PSVariable" @("_", $_)))
-                    }
-                    finally{
-                        Pop-Location
-                    }
+        $reposToIterate = $gitRepoInfo.Repositories | Where-Object $Predicate 
+
+        $invokeCallback = {
+            param($cb, $path)
+            if ($cb) {
+                # Change to GIT repo directory
+                try {
+                    Push-Location
+                    Set-Location $path
+                    $cb.InvokeWithContext(@{ }, @(New-Object "PSVariable" @("_", $_)))
                 }
-                else {
-                    # Invoke callback where we currently are
-                    $Callback.InvokeWithContext(@{ }, @(New-Object "PSVariable" @("_", $_)))
+                finally {
+                    Pop-Location
                 }
+            }
+        }
+        
+        if ($Parallel) {
+            $jobs = $reposToIterate | ForEach-Object -Process { 
+                Start-Job { 
+                    param($cmd, $cb, $path) 
+                    # Script block parameters are projected as strings, therefore we've to recreate the scriptblock objects
+                    & ([Scriptblock]::Create($cmd)) -cb ([Scriptblock]::Create($cb)) `
+                        -path $path
+                } -ArgumentList $invokeCallback, $Callback, $_.Path
+            }
+
+            # Wait for the jobs and receive theirs results
+            $null = Wait-Job -Job $jobs
+            Receive-Job -Job $jobs
+            $null = Remove-Job -Job $jobs
+        }
+        else {
+            # Do actions sequential
+            $reposToIterate | ForEach-Object -Process {
+                & $invokeCallback -cb $Callback -path $_.Path
             }
         }
     }

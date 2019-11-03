@@ -58,6 +58,7 @@ function New-GitRepositoryIndex {
                     Path          = (Get-Location).Path
                     RemoteUrl     = git remote -v | Select-String "(?<remote>http(s)?://.*\s)" | Select-Object -first 1 @{Label = "remote"; Expression = { $_.Matches.Captures.Value } } | select-object -ExpandProperty remote
                     DefaultBranch = (git branch -a ) | ForEach-Object { $_ -match "(?<branch>^\*\s.*)" } | Where-Object { $_ } | ForEach-Object { $Matches.branch.Trim('*').Trim()} | Select-Object -First 1
+                    Name = Split-Path -Path (git rev-parse --show-toplevel) -Leaf
                 }
             } `
             -End { Pop-Location } 

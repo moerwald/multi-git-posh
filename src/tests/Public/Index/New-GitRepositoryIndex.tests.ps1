@@ -1,33 +1,21 @@
 Remove-Module MultiGitPosh -ErrorAction SilentlyContinue
 Import-Module "$PSScriptRoot/../../../module/MultiGitPosh.psd1" -Verbose
 
+. "$PSScriptRoot/../../Helpers/CreateTestRepositories.ps1"
+
 Describe "Tests for index file descripton" {
 
     BeforeEach {
-        Get-ChildItem $env:TEMP -Recurse -Include "testRepos*" | Remove-Item -Recurse -Force
+        CreateTestRepositories 
         Push-Location
-        Set-Location $env:temp
-        New-Item -Name "testRepos" -ItemType Directory -Path .
-        Set-Location "testRepos"
-        "repo_1", "repo_2", "repo_3" | Foreach-Object { 
-            Push-Location
-            try {
-                New-Item -Path . -ItemType Directory -Name $_
-                Set-Location $_
-                git init
-                "test" >> ReadMe.md
-                git add ReadMe.md
-                git commit -m "Initial commit"
-            }
-            finally {
-                Pop-Location
-            }
-        }
+        Set-Location "$env:TEMP/testRepos"
     }
 
     AfterEach {
         Pop-Location
     }
+
+
     It "Index file is created" {
         New-GitRepositoryIndex 
 

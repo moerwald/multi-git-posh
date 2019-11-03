@@ -33,7 +33,7 @@ function ForEach-GitRepository {
         [Parameter(Mandatory = $false, Position = 1)]
         [ValidateNotNullOrEmpty()]
         [bool]
-        $ChangeLocationToGitRepo = $false,
+        $ChangeLocationToGitRepo = $true,
         [Parameter(Mandatory = $false, Position = 2)]
         [ValidateNotNullOrEmpty()]
         [scriptblock]

@@ -89,7 +89,7 @@ function Get-GitStatusForAllRepositories {
                     "Repository"     = $_.Name
                     "ItemsUntracked" = $untrackedItems
                     "Index"          = $gitIndex
-                    "WorkingTree" = $gitWorkTree
+                    "WorkingTree"    = $gitWorkTree
                     "Path"           = $_.Path
                     "RemoteUrl"      = $_.RemoteUrl
                 }
@@ -99,6 +99,17 @@ function Get-GitStatusForAllRepositories {
 
 
         if (!$PassThrugh) {
+            $result | Select-Object Repository, `
+                        @{Name="Idx_+"; Expression = {$_."Index"."Added"}}, `
+                        @{Name="Idx_~"; Expression = {$_."Index"."Modified"}}, `
+                        @{Name="Idx_-"; Expression = {$_."Index"."Deleted"}}, `
+                        @{Name="Wt_+"; Expression = {$_."WorkingTree"."Added"}}, `
+                        @{Name="Wt_~"; Expression = {$_."WorkingTree"."Modified"}}, `
+                        @{Name="Wt_-"; Expression = {$_."WorkingTree"."Deleted"}}, `
+                        Path,
+                        RemoteUrl | Format-Table
+
+
             $result | Format-Table
         }
         else {

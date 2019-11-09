@@ -46,13 +46,13 @@ function ForEach-GitRepository {
         $reposToIterate = GetFilteredRepositories -predicate $Predicate
 
         $invokeCallback = {
-            param($cb, $path)
+            param($cb, $path, $gitRepositoryObject)
             if ($cb) {
                 # Change to GIT repo directory
                 try {
                     Push-Location
                     Set-Location $path
-                    $cb.InvokeWithContext(@{ }, @(New-Object "PSVariable" @("_", $_)))
+                    $cb.InvokeWithContext(@{ }, @(New-Object "PSVariable" @("_", $gitRepositoryObject)))
                 }
                 finally {
                     Pop-Location
@@ -67,7 +67,7 @@ function ForEach-GitRepository {
                     # Script block parameters are projected as strings, therefore we've to recreate the scriptblock objects
                     & ([Scriptblock]::Create($cmd)) -cb ([Scriptblock]::Create($cb)) `
                         -path $path
-                } -ArgumentList $invokeCallback, $Callback, $_.Path
+                } -ArgumentList $invokeCallback, $Callback, $_.Path, $_
             }
 
             # Wait for the jobs and receive theirs results
@@ -77,8 +77,10 @@ function ForEach-GitRepository {
         }
         else {
             # Do actions sequential
-            $reposToIterate | ForEach-Object -Process {
-                & $invokeCallback -cb $Callback -path $_.Path
+            for ($i = 0; $i -lt $reposToIterate.Count; $i++) {
+                $item = $reposToIterate[$i]
+                
+                & $invokeCallback -cb $Callback -path $item.Path -gitRepositoryObject $item
             }
         }
     }

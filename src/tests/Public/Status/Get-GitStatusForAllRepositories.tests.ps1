@@ -16,21 +16,124 @@ Describe "Tests to check if git status functionallity works" {
         Pop-Location
     }
 
-    It "New file was created but not added to GIT index"{
-        $repoToCheck = "repo_1"
-        $predictate = { $_.Name -eq $repoToCheck}
-        ForEach-GitRepository -Callback { New-Item -Name "newFile.txt" -ItemType File}  -Predicate $predictate
+    Context "Tests for GIT index" {
 
-        $status = Get-GitStatusForAllRepositories -PassThrugh -Predicate $predictate
-        $status."repo_1"."FilesNotAddedToIndex".Count | Should -Be 1
+        It "New file was staged for commit" {
+            $repoToCheck = "repo_1"
+            $predictate = { $_.Name -eq $repoToCheck }
+            ForEach-GitRepository -Callback { 
+                # Create the file
+                $file = "newFile.txt"
+                New-Item -Name $file -ItemType File
+
+                # Add it to the GIT index
+                git add $file
+            }  -Predicate $predictate
+
+            $status = Get-GitStatusForAllRepositories -PassThrugh -Predicate $predictate
+            $status."repo_1"."Index"."Added".Count | Should -Be 1
+        }
+
+        It "Committed file has changed" {
+            $repoToCheck = "repo_1"
+            $predictate = { $_.Name -eq $repoToCheck }
+            ForEach-GitRepository -Callback { 
+                # Create the file
+                $file = "newFile.txt"
+                New-Item -Name $file -ItemType File
+
+                # Add it to the GIT index
+                git add $file
+                git commit -m "Some commit message"
+
+                # Change it after it was added
+                "change" >> $file
+                git add $file
+            }  -Predicate $predictate
+
+            $status = Get-GitStatusForAllRepositories -PassThrugh -Predicate $predictate
+            $status."repo_1"."Index"."Modified".Count | Should -Be 1
+        }
+
+        It "Committed file was deleted via git rm" {
+            $repoToCheck = "repo_1"
+            $predictate = { $_.Name -eq $repoToCheck }
+            ForEach-GitRepository -Callback { 
+                # Create the file
+                $file = "newFile.txt"
+                New-Item -Name $file -ItemType File
+
+                # Add it to the GIT index
+                git add $file
+                git commit -m "Some commit message"
+
+                # Change it after it was added
+                git rm $file
+            }  -Predicate $predictate
+
+            $status = Get-GitStatusForAllRepositories -PassThrugh -Predicate $predictate
+            $status."repo_1"."Index"."Deleted".Count | Should -Be 1
+        }
     }
 
-    It "Already indexed file was changed"{
+    Context "Tests for GIT working tree" {
+
+        It "Committed file was deleted" {
+            $repoToCheck = "repo_1"
+            $predictate = { $_.Name -eq $repoToCheck }
+            ForEach-GitRepository -Callback { 
+                # Create the file
+                $file = "newFile.txt"
+                New-Item -Name $file -ItemType File
+
+                # Add it to the GIT index
+                git add $file
+                git commit -m "Some commit message"
+
+                remove-item $file
+            }  -Predicate $predictate
+
+            $status = Get-GitStatusForAllRepositories -PassThrugh -Predicate $predictate
+            $status."repo_1"."WorkingTree"."Deleted".Count | Should -Be 1
+        }
+
+        It "Committed file was changed but not added for commit" {
+            $repoToCheck = "repo_1"
+            $predictate = { $_.Name -eq $repoToCheck }
+            ForEach-GitRepository -Callback { 
+                # Create the file
+                $file = "newFile.txt"
+                New-Item -Name $file -ItemType File
+
+                # Add it to the GIT index
+                git add $file
+                git commit -m "Some commit message"
+
+                "test" >> $file
+
+            }  -Predicate $predictate
+
+            $status = Get-GitStatusForAllRepositories -PassThrugh -Predicate $predictate
+            $status."repo_1"."WorkingTree"."Modified".Count | Should -Be 1
+        }
+
+
+        It "File is untracked" {
+            $repoToCheck = "repo_1"
+            $predictate = { $_.Name -eq $repoToCheck }
+            ForEach-GitRepository -Callback { 
+                # Create the file
+                $file = "newFile.txt"
+                New-Item -Name $file -ItemType File
+            }  -Predicate $predictate
+
+            $status = Get-GitStatusForAllRepositories -PassThrugh -Predicate $predictate
+            $status."repo_1"."ItemsUntracked".Count | Should -Be 1
+        }
+
+
     }
 
-    It "File was marked for commit"{
-    }
-
-    It "File was marked for commit AND changed afterwards"{
+    It "File was marked for commit AND changed afterwards" {
     }
 }

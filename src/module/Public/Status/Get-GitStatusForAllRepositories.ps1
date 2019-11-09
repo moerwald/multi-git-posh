@@ -20,14 +20,14 @@
 .FUNCTIONALITY
     The functionality that best describes this cmdlet
 #>
-function Get-GitStatusForAllRepositories{
+function Get-GitStatusForAllRepositories {
     [CmdletBinding()]
     [Alias("Get-GitStatus")]
     Param (
         # Predicate to filter GIT repositories, that should be excluded
         [Parameter(Mandatory = $false, Position = 0)]
         [scriptblock]
-        $Predicate = { $true},
+        $Predicate = { $true },
         [Parameter(Mandatory = $false, Position = 1)]
         [switch]
         $PassThrugh,
@@ -43,28 +43,65 @@ function Get-GitStatusForAllRepositories{
         $result = ForEach-GitRepository -Callback {
             git fetch --all
             $status = git status -s
-            $filesNotAddedToIndex =  @($status | ForEach-Object { 
-                if ($_ -match "^\?\?\s(.*)") { 
-                    $Matches[1]
-                } 
-            })
+            $untrackedItems = @()
+
+            $added = "Added"
+            $modified = "Modified"
+            $deleted = "Deleted"
+
+            $gitIndex = @{
+                $added    = @()
+                $modified = @()
+                $deleted  = @()
+            }
+
+            $gitWorkTree = @{
+                $modified = @()
+                $deleted  = @()
+            }
+
+            $status | ForEach-Object { 
+                if ($_ -match "^\?\?\s(.*)") {
+                    $untrackedItems += $Matches[1]
+                }
+
+                if ($_ -match "^A.?\s(.*)") {
+                    $gitIndex.Added += $Matches[1]
+                }
+                if ($_ -match "^M.?\s(.*)") {
+                    $gitIndex.Modified += $Matches[1]
+                }
+                if ($_ -match "^D.?\s(.*)") {
+                    $gitIndex.Deleted += $Matches[1]
+                }
+
+                if ($_ -match "^.?M\s(.*)") {
+                    $gitWorkTree.Modified += $Matches[1]
+                }
+                
+                if ($_ -match "^.?D\s(.*)") {
+                    $gitWorkTree.Deleted += $Matches[1]
+                }
+            }
 
             @{
                 $_.Name = @{
-                    "Repository" = $_.Name
-                    "FilesNotAddedToIndex" = $filesNotAddedToIndex
-                    "Path" = $_.Path
-                    "RemoteUrl" = $_.RemoteUrl
+                    "Repository"     = $_.Name
+                    "ItemsUntracked" = $untrackedItems
+                    "Index"          = $gitIndex
+                    "WorkingTree" = $gitWorkTree
+                    "Path"           = $_.Path
+                    "RemoteUrl"      = $_.RemoteUrl
                 }
             }
 
         } -Parallel:$Parallel -Predicate $Predicate
 
 
-        if (!$PassThrugh){
+        if (!$PassThrugh) {
             $result | Format-Table
         }
-        else{
+        else {
             $result
         }
     }

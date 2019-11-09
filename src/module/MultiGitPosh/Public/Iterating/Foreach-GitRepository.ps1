@@ -34,6 +34,7 @@ function ForEach-GitRepository {
         [ValidateNotNullOrEmpty()]
         [scriptblock]
         $Predicate = { $true },
+        [Parameter(Mandatory = $false, Position = 2)]
         [switch]
         $Parallel
     )
@@ -42,10 +43,7 @@ function ForEach-GitRepository {
     }
     
     end {
-        $path = Join-Path -Path $IndexDirectoryName -ChildPath $IndexFileName
-        $gitRepoInfo = Get-Content $path | ConvertFrom-Json -Depth 10
-
-        $reposToIterate = $gitRepoInfo.Repositories | Where-Object $Predicate 
+        $reposToIterate = GetFilteredRepositories -predicate $Predicate
 
         $invokeCallback = {
             param($cb, $path)
@@ -85,3 +83,4 @@ function ForEach-GitRepository {
         }
     }
 }
+

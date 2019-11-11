@@ -41,7 +41,7 @@ function Get-GitStatusForAllRepositories {
     
     end {
         $result = ForEach-GitRepository -Callback {
-            git fetch --all
+            $null = git fetch --all
             $status = git status -s
             $untrackedItems = @()
 
@@ -84,9 +84,17 @@ function Get-GitStatusForAllRepositories {
                 }
             }
 
+            $statusSummary = "+{0} ~{1} -{2} | ~{3} -{4}" -f `
+                $gitIndex.Added.Count, 
+                $gitIndex.Modified.Count, 
+                $gitIndex.Deleted.Count, 
+                $gitWorkTree.Modified.Count, 
+                $gitWorkTree.Deleted.Count 
+
             @{
                 $_.Name = @{
                     "Repository"     = $_.Name
+                    "StatusSummary"  = $statusSummary
                     "ItemsUntracked" = $untrackedItems
                     "Index"          = $gitIndex
                     "WorkingTree"    = $gitWorkTree
@@ -99,18 +107,7 @@ function Get-GitStatusForAllRepositories {
 
 
         if (!$PassThrugh) {
-            $result | Select-Object Repository, `
-                        @{Name="Idx_+"; Expression = {$_."Index"."Added"}}, `
-                        @{Name="Idx_~"; Expression = {$_."Index"."Modified"}}, `
-                        @{Name="Idx_-"; Expression = {$_."Index"."Deleted"}}, `
-                        @{Name="Wt_+"; Expression = {$_."WorkingTree"."Added"}}, `
-                        @{Name="Wt_~"; Expression = {$_."WorkingTree"."Modified"}}, `
-                        @{Name="Wt_-"; Expression = {$_."WorkingTree"."Deleted"}}, `
-                        Path,
-                        RemoteUrl | Format-Table
-
-
-            $result | Format-Table
+            $result | Select-Object Repository, StatusSummary, Path, RemoteUrl | Format-Table
         }
         else {
             $result

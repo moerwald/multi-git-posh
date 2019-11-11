@@ -78,6 +78,7 @@ function ForEach-GitRepository {
         else {
             # Do actions sequential
             for ($i = 0; $i -lt $reposToIterate.Count; $i++) {
+                Write-Progress -Activity "Fetching info" -PercentComplete ($i/$reposToIterate.Count*100)
                 $item = $reposToIterate[$i]
                 
                 & $invokeCallback -cb $Callback -path $item.Path -gitRepositoryObject $item

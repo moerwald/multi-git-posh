@@ -1,5 +1,5 @@
 Remove-Module MultiGitPosh -ErrorAction SilentlyContinue
-Import-Module "$PSScriptRoot/../../../module/MultiGitPosh/MultiGitPosh.psd1" -Verbose
+Import-Module "$PSScriptRoot/../../../module/MultiGitPosh.psd1" 
 
 . "$PSScriptRoot/../../Helpers/CreateTestRepositories.ps1"
 

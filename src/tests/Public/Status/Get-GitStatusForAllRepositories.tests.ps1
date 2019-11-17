@@ -1,5 +1,5 @@
 Remove-Module MultiGitPosh -ErrorAction SilentlyContinue
-Import-Module "$PSScriptRoot/../../../module/MultiGitPosh.psd1" -Verbose
+Import-Module "$PSScriptRoot/../../../module/MultiGitPosh.psd1" 
 
 . "$PSScriptRoot/../../Helpers/CreateTestRepositories.ps1"
 
@@ -131,9 +131,32 @@ Describe "Tests to check if git status functionallity works" {
             $status."repo_1"."ItemsUntracked".Count | Should -Be 1
         }
 
+        It "File was marked for commit AND changed afterwards" {
+            $repoToCheck = "repo_1"
+            $predictate = { $_.Name -eq $repoToCheck }
+
+            # Arrange
+            ForEach-GitRepository -Callback { 
+                # Create the file
+                $file = "newFile.txt"
+                New-Item -Name $file -ItemType File
+
+                # Add it to the GIT index
+                git add $file
+                git commit -m "Some commit message"
+
+                # Chang the file after committing it
+                "someText" >> $file
+
+            }  -Predicate $predictate
+
+            # Act
+            $status = Get-GitStatusForAllRepositories -PassThrugh -Predicate $predictate
+
+            # Assert
+            $status."repo_1"."WorkingTree"."Modified".Count | Should -Be 1
+        }
 
     }
 
-    It "File was marked for commit AND changed afterwards" {
-    }
 }

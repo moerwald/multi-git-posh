@@ -41,7 +41,11 @@ function Get-GitStatusForAllRepositories {
     
     end {
         $result = ForEach-GitRepository -Callback {
+
+            # Fetch remote repository info
             $null = git fetch --all
+
+            # Check for file changes in local working tree, index
             $status = git status -s
             $added = "Added"
             $modified = "Modified"
@@ -59,6 +63,7 @@ function Get-GitStatusForAllRepositories {
                 $deleted  = @()
             }
 
+            # Detect files changes
             $status | ForEach-Object { 
                 if ($_ -match "^A.?\s(.*)") {
                     $gitIndex.Added += $Matches[1]
@@ -90,10 +95,16 @@ function Get-GitStatusForAllRepositories {
                 $gitWorkTree.Modified.Count, 
                 $gitWorkTree.Deleted.Count 
 
+            # Add behind, ahead, diverged info
+            $pushable , $pullable = GetSyncStatus
+
+            # Return the result to pipeline
             @{
                 $_.Name = @{
                     "Repository"     = $_.Name
                     "StatusSummary"  = $statusSummary
+                    "Pushable"       = $pushable
+                    "Pullable"       = $pullable
                     "Index"          = $gitIndex
                     "WorkingTree"    = $gitWorkTree
                     "Path"           = $_.Path
@@ -103,12 +114,24 @@ function Get-GitStatusForAllRepositories {
 
         } -Parallel:$Parallel -Predicate $Predicate
 
-
-        if (!$PassThrugh) {
-            $result | Select-Object Repository, StatusSummary, Path, RemoteUrl | Format-Table
-        }
-        else {
-            $result
-        }
+        # Return result to pipeline 
+        $result
     }
+}
+
+function GetSyncStatus{
+            $status = git status -uno
+            $pushable = $pullable = $false
+            if ($status -contains "ahead"){
+                $pushable = $true
+            } 
+            elseif ($status -contains "behind") {
+                $pullable = $true
+                
+            }
+            elseif ($status -contains "diverged") {
+                $pushable = $pullable = $true
+            }
+
+            $pushable, $pullable
 }

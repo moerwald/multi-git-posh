@@ -43,8 +43,6 @@ function Get-GitStatusForAllRepositories {
         $result = ForEach-GitRepository -Callback {
             $null = git fetch --all
             $status = git status -s
-            $untrackedItems = @()
-
             $added = "Added"
             $modified = "Modified"
             $deleted = "Deleted"
@@ -56,15 +54,12 @@ function Get-GitStatusForAllRepositories {
             }
 
             $gitWorkTree = @{
+                $added    = @()
                 $modified = @()
                 $deleted  = @()
             }
 
             $status | ForEach-Object { 
-                if ($_ -match "^\?\?\s(.*)") {
-                    $untrackedItems += $Matches[1]
-                }
-
                 if ($_ -match "^A.?\s(.*)") {
                     $gitIndex.Added += $Matches[1]
                 }
@@ -73,6 +68,10 @@ function Get-GitStatusForAllRepositories {
                 }
                 if ($_ -match "^D.?\s(.*)") {
                     $gitIndex.Deleted += $Matches[1]
+                }
+
+                if ($_ -match "^\?\?\s(.*)") {
+                    $gitWorkTree.Added += $Matches[1]
                 }
 
                 if ($_ -match "^.?M\s(.*)") {
@@ -95,7 +94,6 @@ function Get-GitStatusForAllRepositories {
                 $_.Name = @{
                     "Repository"     = $_.Name
                     "StatusSummary"  = $statusSummary
-                    "ItemsUntracked" = $untrackedItems
                     "Index"          = $gitIndex
                     "WorkingTree"    = $gitWorkTree
                     "Path"           = $_.Path

@@ -128,7 +128,7 @@ Describe "Tests to check if git status functionallity works" {
             }  -Predicate $predictate
 
             $status = Get-GitStatusForAllRepositories -PassThrugh -Predicate $predictate
-            $status."repo_1"."ItemsUntracked".Count | Should -Be 1
+            $status."repo_1"."WorkingTree"."Added".Count | Should -Be 1
         }
 
         It "File was marked for commit AND changed afterwards" {

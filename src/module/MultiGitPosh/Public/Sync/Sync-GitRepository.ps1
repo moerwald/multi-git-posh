@@ -28,12 +28,12 @@ function Sync-GitRepository {
     
     end {
         ForEach-GitRepository -Callback {
+            Write-Host "Sync $($_.Name)" -ForegroundColor Magenta
             if ($Pull){
                 git pull --tags
             }
             else{
                 git fetch --all --prune --tags
-
             }
         }
     }

@@ -19,6 +19,8 @@ Properties {
     {
         $Verbose = @{Verbose = $True}
     }
+
+    $ENV:BHPSModulePath = "./src/module/MultiGitPosh.psd1"
 }
 
 Task Default -Depends Deploy
@@ -34,17 +36,18 @@ Task Init {
 Task Build -Depends Init {
     $lines
     
+    $relativePathToManifest = "src/module/MultiGitPosh.psd1"
     # Load the module, read the exported functions, update the psd1 FunctionsToExport
-    Set-ModuleFunctions
+    Set-ModuleFunctions -Name $relativePathToManifest
 
     # Bump the module version
     Try
     {
-        Step-ModuleVersion -Path $env:BHPSModuleManifest -By Minor
+        Step-ModuleVersion -Path $relativePathToManifest -By Minor
     }
     Catch
     {
-        "Failed to update version for '$env:BHProjectName': $_.`nContinuing with existing version"
+        "Failed to update version for '$relativePathToManifest': $_.`nContinuing with existing version"
     }
 }
 
@@ -52,5 +55,5 @@ Task Deploy -Depends Build {
     $lines
     "Publishing $($env:BHProjectName) from $($ENV:BHPSModulePath) to $($env:BHPSRepoName)"
 
-    Publish-Module -Repository $env:BHPSRepoName -Path $ENV:BHPSModulePath
+    # Publish-Module -Repository MultiGitPosh  -Path $ENV:BHPSModulePath
 }

@@ -12,7 +12,7 @@
 RootModule = 'MultiGitPosh'
 
 # Version number of this module.
-ModuleVersion = '0.0.1'
+ModuleVersion = '0.2.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -30,7 +30,7 @@ CompanyName = 'Unknown'
 Copyright = '(c) moerwald. All rights reserved.'
 
 # Description of the functionality provided by this module
-# Description = ''
+Description = 'Offers functions to perform GIT operations to multiple clonde GIT repositories'
 
 # Minimum version of the PowerShell engine required by this module
 # PowerShellVersion = ''
@@ -69,7 +69,7 @@ Copyright = '(c) moerwald. All rights reserved.'
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = @('New-GitRepositoryIndex', 'ForEach-GitRepository','ForEach-GitRepositoryDirectory' )
+FunctionsToExport = @('ForEach-GitRepository','New-GitRepositoryIndex','Sync-GitRepository')
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()

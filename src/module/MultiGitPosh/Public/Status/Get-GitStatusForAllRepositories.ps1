@@ -36,9 +36,6 @@ function Get-GitStatusForAllRepositories {
         $Parallel
     )
     
-    begin {
-    }
-    
     end {
         $result = ForEach-GitRepository -Callback {
 
@@ -99,18 +96,20 @@ function Get-GitStatusForAllRepositories {
             $pushable , $pullable = GetSyncStatus
 
             # Return the result to pipeline
-            @{
-                $_.Name = @{
-                    "Repository"     = $_.Name
-                    "StatusSummary"  = $statusSummary
-                    "Pushable"       = $pushable
-                    "Pullable"       = $pullable
-                    "Index"          = $gitIndex
-                    "WorkingTree"    = $gitWorkTree
-                    "Path"           = $_.Path
-                    "RemoteUrl"      = $_.RemoteUrl
-                }
+            $gitStatus = [pscustomobject] @{
+                "Repository"     = $_.Name
+                "Branch"         = (Get-ActualGitBranch)
+                "StatusSummary"  = $statusSummary
+                "Pushable"       = $pushable
+                "Pullable"       = $pullable
+                "Index"          = $gitIndex
+                "WorkingTree"    = $gitWorkTree
+                "Path"           = $_.Path
+                "RemoteUrl"      = $_.RemoteUrl
             }
+
+            $gitStatus.PSObject.TypeNames.Insert(0,'Moerwald.GitStatus')
+            $gitStatus
 
         } -Parallel:$Parallel -Predicate $Predicate
 

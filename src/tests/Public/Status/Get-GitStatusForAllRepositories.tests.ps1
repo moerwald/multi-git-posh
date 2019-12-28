@@ -31,7 +31,8 @@ Describe "Tests to check if git status functionallity works" {
             }  -Predicate $predictate
 
             $status = Get-GitStatusForAllRepositories -PassThrugh -Predicate $predictate
-            $status."repo_1"."Index"."Added".Count | Should -Be 1
+            $repoInfo = $status | Where-Object { $_.Repository -eq "repo_1"} 
+            $repoInfo."Index"."Added".Count | Should -Be 1
         }
 
         It "Committed file has changed" {
@@ -52,7 +53,8 @@ Describe "Tests to check if git status functionallity works" {
             }  -Predicate $predictate
 
             $status = Get-GitStatusForAllRepositories -PassThrugh -Predicate $predictate
-            $status."repo_1"."Index"."Modified".Count | Should -Be 1
+            $repoInfo = $status | Where-Object { $_.Repository -eq "repo_1"} 
+            $repoInfo."Index"."Modified".Count | Should -Be 1
         }
 
         It "Committed file was deleted via git rm" {
@@ -72,7 +74,8 @@ Describe "Tests to check if git status functionallity works" {
             }  -Predicate $predictate
 
             $status = Get-GitStatusForAllRepositories -PassThrugh -Predicate $predictate
-            $status."repo_1"."Index"."Deleted".Count | Should -Be 1
+            $repoInfo = $status | Where-Object { $_.Repository -eq "repo_1"} 
+            $repoInfo."Index"."Deleted".Count | Should -Be 1
         }
     }
 
@@ -94,7 +97,8 @@ Describe "Tests to check if git status functionallity works" {
             }  -Predicate $predictate
 
             $status = Get-GitStatusForAllRepositories -PassThrugh -Predicate $predictate
-            $status."repo_1"."WorkingTree"."Deleted".Count | Should -Be 1
+            $repoInfo = $status | Where-Object { $_.Repository -eq "repo_1"} 
+            $repoInfo."WorkingTree"."Deleted".Count | Should -Be 1
         }
 
         It "Committed file was changed but not added for commit" {
@@ -114,7 +118,8 @@ Describe "Tests to check if git status functionallity works" {
             }  -Predicate $predictate
 
             $status = Get-GitStatusForAllRepositories -PassThrugh -Predicate $predictate
-            $status."repo_1"."WorkingTree"."Modified".Count | Should -Be 1
+            $repoInfo = $status | Where-Object { $_.Repository -eq "repo_1"} 
+            $repoInfo."WorkingTree"."Modified".Count | Should -Be 1
         }
 
 
@@ -128,7 +133,8 @@ Describe "Tests to check if git status functionallity works" {
             }  -Predicate $predictate
 
             $status = Get-GitStatusForAllRepositories -PassThrugh -Predicate $predictate
-            $status."repo_1"."WorkingTree"."Added".Count | Should -Be 1
+            $repoInfo = $status | Where-Object { $_.Repository -eq "repo_1"} 
+            $repoInfo."WorkingTree"."Added".Count | Should -Be 1
         }
 
         It "File was marked for commit AND changed afterwards" {
@@ -154,7 +160,8 @@ Describe "Tests to check if git status functionallity works" {
             $status = Get-GitStatusForAllRepositories -PassThrugh -Predicate $predictate
 
             # Assert
-            $status."repo_1"."WorkingTree"."Modified".Count | Should -Be 1
+            $repoInfo = $status | Where-Object { $_.Repository -eq "repo_1"} 
+            $repoInfo."WorkingTree"."Modified".Count | Should -Be 1
         }
 
     }

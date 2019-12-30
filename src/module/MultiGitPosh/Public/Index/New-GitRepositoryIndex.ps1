@@ -32,8 +32,7 @@ function New-GitRepositoryIndex {
     }
     
     end {
-        $indexDirectoryName = ".index_multi_git_posh"
-        $gitIndexFilePath = Join-Path -Path $RootPathOfGitRepositories -ChildPath $indexDirectoryName
+        $gitIndexFilePath = Join-Path -Path $RootPathOfGitRepositories -ChildPath $IndexDirectoryName
         if (Test-Path -Path $gitIndexFilePath) {
             throw "$indexDirectoryName already exists under $RootPathOfGitRepositories. Use 'Update-GitRepositoryIndex' to add new GIT repositories"
         }

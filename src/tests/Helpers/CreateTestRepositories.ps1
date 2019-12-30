@@ -5,6 +5,10 @@ function CreateTestRepositories {
         HelpUri = 'http://www.microsoft.com/',
         ConfirmImpact = 'Medium')]
     Param (
+        # Folder name to create repos to, folder will be created under $env:TEMP
+        [Parameter(Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        $Folder = "testRepos"
     )
     
     end {
@@ -12,13 +16,13 @@ function CreateTestRepositories {
         Push-Location
         try {
             # Remove old test repositories
-            Get-ChildItem $env:TEMP -Recurse -Include "testRepos*" | Remove-Item -Recurse -Force
+            Get-ChildItem $env:TEMP -Recurse -Include "$Folder*" | Remove-Item -Recurse -Force
 
             # Go to temp folder
             Set-Location $env:temp
 
-            New-Item -Name "testRepos" -ItemType Directory -Path .
-            Set-Location "testRepos"
+            New-Item -Name "$Folder" -ItemType Directory -Path .
+            Set-Location "$Folder"
 
             "repo_1", "repo_2", "repo_3" | Foreach-Object { 
                 Push-Location

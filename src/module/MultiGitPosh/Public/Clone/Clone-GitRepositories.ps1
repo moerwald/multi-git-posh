@@ -47,22 +47,25 @@ function Clone-GitRepositories {
             $gitIndexFilePath = CreateDirectoryStructure -DirectoryToCloneTo $DirectoryToCloneTo
             $pathToIndexFile = Join-Path $gitIndexFilePath $IndexFileName
 
-            Copy-Item $GitIndexfile $gitIndexFilePath 
+            Copy-Item $GitIndexfile $pathToIndexFile 
 
             Set-Location $DirectoryToCloneTo
 
             $gitRepoInfo = Get-Content $pathToIndexFile | ConvertFrom-Json -Depth 10
 
-            foreach($repo in $gitRepoInfo.Repositories){
+            foreach ($repo in $gitRepoInfo.Repositories) {
 
                 $remoteUrl = $repo.RemoteUrl
-                Write-Host "Cloning $remoteUrl" -ForegroundColor Magenta
-                Invoke-ExpressionAndThrowIfFailed -Command "git clone $remoteUrl"
+                Clone -RemoteUrl $remoteUrl
 
-                $branch = $repo.DefaultBranch
-                Write-Host "Checking out $branch" -ForegroundColor Magenta
-                Invoke-ExpressionAndThrowIfFailed -Command "git checkout $branch"
+                $localGitRepo = ((Split-Path $remoteUrl -Leaf).Trim()) -replace "\.git$"
+                Set-Location $localGitRepo
+                $repo | Add-Member -Name "Path" -MemberType NoteProperty -Value (Get-Location)
+
+                Checkout -Branch $repo.DefaultBranch
             }
+
+            UpdateIndexFile -GitRepoInfo $gitRepoInfo -PathToIndexFile $pathToIndexFile
         }
         finally {
             Pop-Location
@@ -70,13 +73,12 @@ function Clone-GitRepositories {
     }
 }
 
-function CreateDirectoryStructure{
+function CreateDirectoryStructure {
     param ( $DirectoryToCloneTo)
 
     NewDirectoryIfNeeded  -DirectoryToCloneTo $DirectoryToCloneTo
     NewIndexFileDirectory -DirectoryToCloneTo $DirectoryToCloneTo
 }
-
 
 function NewDirectoryIfNeeded { 
     param ( $DirectoryToCloneTo)
@@ -93,5 +95,28 @@ function NewIndexFileDirectory {
     if (Test-Path -Path $gitIndexFilePath) {
         throw "$indexDirectoryName already exists under $DirectoryToCloneTo. "
     }
+
+    New-Item $gitIndexFilePath -ItemType Directory | Out-Null
+
     $gitIndexFilePath
+}
+
+function UpdateIndexFile {
+    param($GitRepoInfo, $PathToIndexFile)
+
+    $GitRepoInfo | ConvertTo-Json | Out-File $PathToIndexFile
+}
+
+function Clone {
+    param($RemoteUrl)
+
+    Write-Host "Cloning $RemoteUrl" -ForegroundColor Magenta
+    Invoke-ExpressionAndThrowIfFailed -Command "git clone $RemoteUrl"
+}
+
+function Checkout {
+    param($Branch)
+
+    Write-Host "Checking out $Branch" -ForegroundColor Magenta
+    Invoke-ExpressionAndThrowIfFailed -Command "git checkout $Branch"
 }

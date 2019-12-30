@@ -10,7 +10,7 @@ Describe "Tests to check if git status functionallity works" {
     BeforeEach {
         Push-Location
 
-        Clone-GitRepositories -GitIndexfile ".\index.json" -DirectoryToCloneTo $cloneDirectory
+        Clone-GitRepositories -GitIndexfile "$PSScriptRoot/index.json" -DirectoryToCloneTo $cloneDirectory
         Set-Location $cloneDirectory
     }
 

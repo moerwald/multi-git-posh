@@ -1,0 +1,14 @@
+{
+  "Repositories": [
+    {
+      "Name": "how-to-use-git-hooks-for-csharp-projects",
+      "RemoteUrl": "https://github.com/moerwald/how-to-use-git-hooks-for-csharp-projects.git ",
+      "DefaultBranch": "develop"
+    },
+    {
+      "Name": "multi-git-posh",
+      "RemoteUrl": "https://github.com/moerwald/multi-git-posh.git ",
+      "DefaultBranch": "develop"
+    }
+  ]
+}

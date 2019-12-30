@@ -13,6 +13,7 @@ Describe "Tests for index file descripton" {
 
     AfterEach {
         Pop-Location
+        Remove-Item "$env:TEMP/testRepos" -Recurse -Force
     }
 
 

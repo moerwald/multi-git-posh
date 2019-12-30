@@ -14,6 +14,7 @@ Describe "Tests to check if repository iterating works" {
 
     AfterEach {
         Pop-Location
+        Remove-Item "$env:TEMP/testRepos" -Recurse -Force
     }
 
     It "All three repositories shall be iterated through"{

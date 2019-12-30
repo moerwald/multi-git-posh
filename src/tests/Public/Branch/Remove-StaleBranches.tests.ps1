@@ -38,6 +38,7 @@ Describe "Tests to check if git status functionallity works" {
 
     AfterEach {
         Pop-Location
+        Remove-Item "$env:TEMP/testRepos" -Recurse -Force
     }
 
     Context "Tests for stale branch removing" {

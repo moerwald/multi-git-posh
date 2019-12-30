@@ -1,0 +1,23 @@
+name: Run Pester tests
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup GIT E-Mail
+      run:  git config --global user.email "moerwald@moerwald.com"
+      shell: pwsh
+    - name: Setup GIT username
+      run: git config --global user.name "moerwald" 
+      shell: pwsh
+    - name: Install Pester
+      run: Install-Module -Name Pester -Force
+      shell: pwsh
+    - name: Run Pester tests
+      run: Invoke-Pester
+      shell: pwsh

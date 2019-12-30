@@ -24,6 +24,7 @@ function Invoke-ExpressionAndThrowIfFailed {
     }
 
     end {
+
         if ($pscmdlet.ShouldProcess($command)) {
             $output = Invoke-Expression $command
             if ((-not $?) -or ($LASTEXITCODE -ne 0)) {

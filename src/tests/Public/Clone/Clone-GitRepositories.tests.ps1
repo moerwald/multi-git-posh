@@ -25,7 +25,7 @@ Describe "Tests to check if git status functionallity works" {
             function NRepositoriesExist {
                 param($NrOfRepos)
 
-                (Get-ChildItem).Count | Should -Be $NrOfRepos
+                (Get-ChildItem -Exclude ".index_multi_git_posh").Count | Should -Be $NrOfRepos
             }
 
             NRepositoriesExist -NrOfRepos 2

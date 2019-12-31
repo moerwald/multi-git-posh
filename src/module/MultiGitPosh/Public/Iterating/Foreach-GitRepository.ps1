@@ -1,24 +1,17 @@
 <#
 .SYNOPSIS
-    Short description
+    Iterates over all GIT repositories defined in the index file.
 .DESCRIPTION
-    Long description
+    Iterates over all GIT repositories defined in the index file.
+    With the $Callback parameter you can define a script block that
+    is called in directory of the actual iterated GIT repository.
+    If some repositories should be filtered a custom predicate can
+    be given via the $Predicate parameter.
 .EXAMPLE
-    Example of how to use this cmdlet
-.EXAMPLE
-    Another example of how to use this cmdlet
-.INPUTS
-    Inputs to this cmdlet (if any)
-.OUTPUTS
-    Output from this cmdlet (if any)
-.NOTES
-    General notes
-.COMPONENT
-    The component this cmdlet belongs to
-.ROLE
-    The role this cmdlet belongs to
-.FUNCTIONALITY
-    The functionality that best describes this cmdlet
+    > ForEach-GitRepository -Callback { Write-host $_ } -Predicate { $_.Name -eq "AutoCake" }
+       @{Path=C:\Users\andre\source\repos\AutoCake; Name=AutoCake; RemoteUrl=https://github.com/moerwald/AutoCake.git ; DefaultBranch=develop}
+
+       Print all available information of the "AutoCake" repository.
 #>
 function ForEach-GitRepository {
     [CmdletBinding(

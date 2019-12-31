@@ -1,24 +1,30 @@
 <#
 .SYNOPSIS
-    Short description
+    Clones all repositories described by an index file.
 .DESCRIPTION
-    Long description
+    Clones all repositories described by an index file, to a given
+    clone directory. Depending on the given "DefaultBranch" property
+    in the index a specific branch/tag gets checked out after
+    the repository was cloned.
 .EXAMPLE
-    Example of how to use this cmdlet
-.EXAMPLE
-    Another example of how to use this cmdlet
-.INPUTS
-    Inputs to this cmdlet (if any)
-.OUTPUTS
-    Output from this cmdlet (if any)
-.NOTES
-    General notes
-.COMPONENT
-    The component this cmdlet belongs to
-.ROLE
-    The role this cmdlet belongs to
-.FUNCTIONALITY
-    The functionality that best describes this cmdlet
+    Clone-GitRepositories -GitIndexfile "$PSScriptRoot/index.json" -DirectoryToCloneTo $env:TEMP/cloneRoot
+
+    Clones all GIT repositories noted in index.json to "$env:TEMP/cloneRoot". After clone operation cloneRoot
+    contains:
+
+    > tree
+    C:.
+    ├───.index_multi_git_posh
+    │       index_git_repos.json
+    │
+    └───how-to-use-git-hooks-for-csharp-projects
+        │   .gitignore
+        │   .gitpod.Dockerfile
+        │   .gitpod.yml
+        ...
+
+    The index file given via "-GitIndexfile" gets copied to .index_multi_git_posh, so that other functions
+    of this module can be used in the "cloneRoot" folder.
 #>
 function Clone-GitRepositories {
     [CmdletBinding(SupportsShouldProcess = $true,

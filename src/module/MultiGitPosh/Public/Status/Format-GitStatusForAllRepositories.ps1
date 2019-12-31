@@ -1,24 +1,14 @@
 <#
 .SYNOPSIS
-    Short description
+    Formats the output of Get-GitStatusForAllGitRepositories in a colored table view.
 .DESCRIPTION
-    Long description
+    Formats the output of Get-GitStatusForAllGitRepositories in a colored table view. If there
+    are not committed changes, or your local repositories are not in sync. with the remote
+    ones the row will be colored yellow, otherwise green.
 .EXAMPLE
-    Example of how to use this cmdlet
-.EXAMPLE
-    Another example of how to use this cmdlet
-.INPUTS
-    Inputs to this cmdlet (if any)
-.OUTPUTS
-    Output from this cmdlet (if any)
-.NOTES
-    General notes
-.COMPONENT
-    The component this cmdlet belongs to
-.ROLE
-    The role this cmdlet belongs to
-.FUNCTIONALITY
-    The functionality that best describes this cmdlet
+    Get-GitStatusForAllRepositories | Format-GitStatusForAllRepositories
+
+    Returns a colored table view of the status of the several GIT repositories in the index.
 #>
 function Format-GitStatusForAllRepositories {
     [CmdletBinding()]

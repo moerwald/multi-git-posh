@@ -1,8 +1,7 @@
 <#
 .SYNOPSIS
-    Short description
-.DESCRIPTION
-    Long description
+    Removes local branches that have not remote branch any more, for all
+    GIT repositories defined in the index.
 .EXAMPLE
     Example of how to use this cmdlet
 .EXAMPLE

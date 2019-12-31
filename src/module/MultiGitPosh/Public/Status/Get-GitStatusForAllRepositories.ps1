@@ -1,24 +1,22 @@
 <#
 .SYNOPSIS
-    Short description
+    Returns a object containing the status of all GIT repositories noted in the index.
 .DESCRIPTION
-    Long description
+    Returns a object containing the status of all GIT repositories noted in the index.
+    The returned object contains information about:
+       - if your local repositories need to be synced.
+       - number of files deleted, added, modified on the GIT index/workspace
+       - local path of the repositories
+       - remote URLs of the repositories
 .EXAMPLE
-    Example of how to use this cmdlet
-.EXAMPLE
-    Another example of how to use this cmdlet
-.INPUTS
-    Inputs to this cmdlet (if any)
-.OUTPUTS
-    Output from this cmdlet (if any)
-.NOTES
-    General notes
-.COMPONENT
-    The component this cmdlet belongs to
-.ROLE
-    The role this cmdlet belongs to
-.FUNCTIONALITY
-    The functionality that best describes this cmdlet
+    > Get-GitStatusForAllRepositories
+
+    Repository                               Branch                                StatusSummary    Pushable Pullable RemoteUrl
+    ----------                               ------                                -------------    -------- -------- ---------
+    AutoCake                                 develop                               +0 ~0 -0 | ~0 -0 False    False    https://github.com/moerwald/AutoCake.git
+    Cake.GetNuGetLicense                     develop                               +0 ~0 -0 | ~1 -0 False    False    https://github.com/moerwald/Cake.GetNuGetLicense.git     Cake.GitFlow                             feature/createAndMergeReleaseBranches +0 ~0 -0 | ~0 -0 False    False    https://github.com/moerwald/Cake.GitFlow.git
+    c-sharp-git-hooks                        develop                               +0 ~0 -0 | ~2 -0 False    False    https://github.com/moerwald/c-sharp-git-hooks.git        dotnet-thirdpartynotices                 master                                +0 ~0 -0 | ~0 -0 False    False    https://github.com/wrathofodin/dotnet-thirdpartynotices… gitflow_playground                       master                                +0 ~0 -0 | ~0 -0 False    False    https://github.com/moerwald/gitflow_playground.git       github-pages-with-jekyll                 moerwald-patch-3                      +0 ~0 -0 | ~1 -0 False    False    https://github.com/moerwald/github-pages-with-jekyll.gi… hacker                                   master                                +0 ~0 -0 | ~1 -0 False    False    https://github.com/pages-themes/hacker.git
+
 #>
 function Get-GitStatusForAllRepositories {
     [CmdletBinding()]

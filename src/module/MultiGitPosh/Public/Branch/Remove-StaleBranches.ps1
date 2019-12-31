@@ -40,9 +40,11 @@ function Remove-StaleBranches {
 
             $localBranchesWithoutRemoteBranch = @(  
                 $matches = git branch -vv | Select-string -Pattern "\[origin/(?<branchName>.*):\sgone" -AllMatches  
-                $matches.Matches.Groups | Where-Object { 
-                    $_.GetType().ToString() -eq "System.Text.RegularExpressions.Group" -and $_.Name -eq "branchName" 
-                } | Select-Object -ExpandProperty value
+                if ($matches){
+                    $matches.Matches.Groups | Where-Object { 
+                        $_.GetType().ToString() -eq "System.Text.RegularExpressions.Group" -and $_.Name -eq "branchName" 
+                    } | Select-Object -ExpandProperty value
+                }
             )
 
             if ($localBranchesWithoutRemoteBranch.Count -gt 0) {

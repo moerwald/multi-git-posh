@@ -28,13 +28,13 @@ function Clone-GitRepositories {
     [Alias("cgr")]
     Param (
         # Path to GIT index file
-        [Parameter(Mandatory = $true,
-            Position = 0)]
+        [Parameter(Mandatory = $true, Position = 0)]
         [ValidateScript( { Test-Path $_ })]
         [string]
         $GitIndexfile,
         
         # Directory to clone GIT repositores to
+        [Parameter(Mandatory = $true, Position = 1)]
         [ValidateNotNullOrEmpty()]
         [string]
         $DirectoryToCloneTo
@@ -48,10 +48,11 @@ function Clone-GitRepositories {
             $pathToIndexFile = Join-Path $gitIndexFilePath $IndexFileName
 
             Copy-Item $GitIndexfile $pathToIndexFile 
-
-            Set-Location $DirectoryToCloneTo
+            $pathToIndexFile = Resolve-Path $pathToIndexFile
 
             $gitRepoInfo = Get-Content $pathToIndexFile | ConvertFrom-Json -Depth 10
+
+            Set-Location $DirectoryToCloneTo
 
             foreach ($repo in $gitRepoInfo.Repositories) {
 
@@ -59,10 +60,13 @@ function Clone-GitRepositories {
                 Clone -RemoteUrl $remoteUrl
 
                 $localGitRepo = ((Split-Path $remoteUrl -Leaf).Trim()) -replace "\.git$"
+                Push-Location
                 Set-Location $localGitRepo
                 $repo | Add-Member -Name "Path" -MemberType NoteProperty -Value (Get-Location)
 
                 Checkout -Branch $repo.DefaultBranch
+
+                Pop-Location
             }
 
             UpdateIndexFile -GitRepoInfo $gitRepoInfo -PathToIndexFile $pathToIndexFile
